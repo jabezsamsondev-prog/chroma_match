@@ -94,7 +94,7 @@ const ICON_SET = [
     { name: 'headphones', path: 'M3 18v-6a9 9 0 0 1 18 0v6M3 18a3 3 0 0 0 3 3h3v-6H3zm18 0a3 3 0 0 1-3 3h-3v-6h6z', color: '#8b5cf6' },
     { name: 'wifi', path: 'M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01', color: '#00f3ff' },
     { name: 'battery', path: 'M6 7h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm17 5h-2', color: '#22c55e' },
-    { name: 'zap', path: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: '#fbbf24' },
+
     { name: 'award', path: 'M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12', color: '#ffd60a' },
     { name: 'bookmark', path: 'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z', color: '#ec4899' },
     { name: 'flag', path: 'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7', color: '#ef4444' },
@@ -121,8 +121,11 @@ let currentState = {
     timer: 0,
     intervalId: null,
     isLocked: false,
-    combo: 0
+    combo: 0,
+    cardAttempts: {},
+    highScore: 0
 };
+
 
 // --- DOM Elements ---
 const startScreen = document.getElementById('start-screen');
@@ -135,9 +138,14 @@ const gameOverModal = document.getElementById('game-over-modal');
 const finalScoreElement = document.getElementById('final-score');
 const resultTitle = document.getElementById('result-title');
 const mobileWarning = document.getElementById('mobile-warning');
+const highScoreDisplay = document.getElementById('high-score-display');
 
 // --- Init ---
 function init() {
+    // Load High Score
+    currentState.highScore = parseInt(localStorage.getItem('chromaMatchHighScore')) || 0;
+    highScoreDisplay.textContent = currentState.highScore;
+
     gameOverModal.classList.add('hidden'); 
     gameOverModal.style.display = 'none';
 
@@ -186,6 +194,7 @@ function startGame(level) {
     currentState.flippedCards = [];
     currentState.isLocked = false;
     currentState.combo = 0;
+    currentState.cardAttempts = {};
     
     startScreen.classList.remove('active');
     startScreen.classList.add('hidden');
@@ -272,9 +281,27 @@ function checkMatch() {
             currentState.matchedPairs++;
             currentState.combo++;
             
-            const basePoints = 100;
-            const comboBonus = currentState.combo * 10;
-            updateScore(basePoints + comboBonus);
+            // Core Scoring & Timing Logic
+            const val = card1.dataset.value;
+            const attempts = currentState.cardAttempts[val] || 0;
+            
+            let points = 0;
+            let timeBonus = 5; // Base +5s for any pair found
+
+            if (attempts === 0) {
+                // First attempt success
+                points = 500;
+                timeBonus += 20; // Add 20s more (Total 25s)
+            } else {
+                // Decay points based on guesses
+                // Formula: 500 - (attempts * 100), minimum 50 points
+                points = Math.max(50, 500 - (attempts * 100));
+            }
+
+            // Update State
+            updateScore(points);
+            currentState.timer += timeBonus;
+            updateTimerDisplay(); // reflect time jump immediately
             
             currentState.flippedCards = [];
             currentState.isLocked = false;
@@ -285,6 +312,13 @@ function checkMatch() {
             audio.sfxError();
             currentState.combo = 0;
             
+            // Record attempts for both cards involved in the wrong guess
+            const val1 = card1.dataset.value;
+            const val2 = card2.dataset.value;
+            
+            currentState.cardAttempts[val1] = (currentState.cardAttempts[val1] || 0) + 1;
+            currentState.cardAttempts[val2] = (currentState.cardAttempts[val2] || 0) + 1;
+
             card1.classList.add('shake-error');
             card2.classList.add('shake-error');
             
@@ -294,7 +328,7 @@ function checkMatch() {
                 
                 currentState.flippedCards = [];
                 currentState.isLocked = false;
-                updateScore(-10);
+                updateScore(-50); // Minus 50 for wrong guess
             }, 500);
         }, 600);
     }
@@ -353,6 +387,14 @@ function endGame(win) {
         currentState.score += timeBonus;
         resultTitle.textContent = "MEMORY MASTER!";
         resultTitle.style.color = "#00f3ff";
+
+        // Check High Score
+        if (currentState.score > currentState.highScore) {
+            currentState.highScore = currentState.score;
+            localStorage.setItem('chromaMatchHighScore', currentState.highScore);
+            highScoreDisplay.textContent = currentState.highScore;
+            // Optional: New High Score SFX or visual cue could go here
+        }
     } else {
         audio.sfxError();
         resultTitle.textContent = "TIME'S UP!";
