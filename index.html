@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChromaMatch - Memory Game</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="favicon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
     <div class="app-background"></div>
     <div class="particles"></div>
@@ -23,7 +25,7 @@
             </div>
             <h1 class="logo">Chroma<span class="highlight">Match</span></h1>
             <p class="subtitle">QUANTUM MEMORY CHALLENGE</p>
-            
+
             <div class="difficulty-selector">
                 <h3>Select Difficulty</h3>
                 <div class="buttons-container">
@@ -49,15 +51,22 @@
             <div class="game-header">
                 <div class="stat-box time">
                     <!-- Timer SVG -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
                     <span id="timer">00:00</span>
                 </div>
-                
+
                 <h2 class="level-indicator">Hard</h2>
 
                 <div class="stat-box score">
                     <!-- Diamond SVG -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6-7 6 7-6 13-6-13z"></path></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M6 9l6-7 6 7-6 13-6-13z"></path>
+                    </svg>
                     <span id="score">0</span>
                 </div>
             </div>
@@ -98,4 +107,5 @@
     </script>
     <script src="script.js"></script>
 </body>
+
 </html>
