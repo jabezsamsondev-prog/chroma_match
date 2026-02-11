@@ -222,24 +222,24 @@ body {
 
 /* Subtle moving gradient border effect via pseudo-element masking */
 .highscore-container::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 16px;
   padding: 2px; /* Border thickness */
   background: linear-gradient(
-    90deg, 
-    transparent, 
-    rgba(255, 214, 10, 0.3), 
-    rgba(255, 214, 10, 0.8), 
-    rgba(255, 214, 10, 0.3), 
+    90deg,
+    transparent,
+    rgba(255, 214, 10, 0.3),
+    rgba(255, 214, 10, 0.8),
+    rgba(255, 214, 10, 0.3),
     transparent
   );
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
-  mask: 
-    linear-gradient(#fff 0 0) content-box, 
+  mask:
+    linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -249,8 +249,12 @@ body {
 }
 
 @keyframes shineBorder {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .hs-icon-box {
@@ -294,8 +298,13 @@ body {
 }
 
 @keyframes pulseGold {
-  0%, 100% { box-shadow: 0 0 15px rgba(255, 214, 10, 0.2); }
-  50% { box-shadow: 0 0 25px rgba(255, 214, 10, 0.5); }
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(255, 214, 10, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 214, 10, 0.5);
+  }
 }
 
 .difficulty-selector {
@@ -520,7 +529,7 @@ body {
 
 .grid-6 {
   grid-template-columns: repeat(6, 1fr);
-  max-width: 850px;
+  max-width: 900px;
   gap: 14px;
 }
 
@@ -528,6 +537,24 @@ body {
   grid-template-columns: repeat(8, 1fr);
   max-width: 1000px;
   gap: 12px;
+}
+
+.card-placeholder {
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-placeholder svg {
+  width: 40%;
+  height: 40%;
+  stroke: var(--text-muted);
+  opacity: 0.3;
 }
 
 /* Premium Cards */

@@ -106,9 +106,9 @@ const ICON_SET = [
 
 // --- Config ---
 const LEVELS = {
-    easy: { grid: 4, time: 60, pairs: 8 },
-    medium: { grid: 6, time: 120, pairs: 18 },
-    hard: { grid: 8, time: 180, pairs: 32 }
+    easy: { cols: 4, rows: 3, time: 45, pairs: 6 },
+    medium: { cols: 4, rows: 4, time: 60, pairs: 8 },
+    hard: { cols: 6, rows: 4, time: 90, pairs: 12 }
 };
 
 // --- State ---
@@ -217,12 +217,13 @@ function startGame(level) {
 
 function generateGrid(config) {
     gridElement.innerHTML = '';
-    gridElement.className = `grid grid-${config.grid}`;
+    // Use columns for grid class (e.g., grid-4, grid-6)
+    gridElement.className = `grid grid-${config.cols}`;
     
     const shuffledIcons = [...ICON_SET].sort(() => 0.5 - Math.random());
     const selectedIcons = shuffledIcons.slice(0, config.pairs);
     const gameDeck = [...selectedIcons, ...selectedIcons].sort(() => 0.5 - Math.random());
-
+    
     gameDeck.forEach((icon, index) => {
         const card = document.createElement('div');
         card.classList.add('card');
@@ -279,29 +280,25 @@ function checkMatch() {
             card2.classList.remove('flipped');
 
             currentState.matchedPairs++;
+            
+            // --- Advanced Scoring System ---
+            // COMBO Multiplier: Increases by 1 for every consecutive match
             currentState.combo++;
-            
-            // Core Scoring & Timing Logic
-            const val = card1.dataset.value;
-            const attempts = currentState.cardAttempts[val] || 0;
-            
-            let points = 0;
-            let timeBonus = 5; // Base +5s for any pair found
+            const comboMultiplier = Math.min(currentState.combo, 5); // Max 5x multiplier
 
-            if (attempts === 0) {
-                // First attempt success
-                points = 500;
-                timeBonus += 20; // Add 20s more (Total 25s)
-            } else {
-                // Decay points based on guesses
-                // Formula: 500 - (attempts * 100), minimum 50 points
-                points = Math.max(50, 500 - (attempts * 100));
-            }
+            // Base Points
+            const basePoints = 100;
+            
+            // Time Bonus: Add 3 seconds for every match found
+            const timeBonus = 3;
+            
+            // Calculate final points for this move
+            const points = (basePoints * comboMultiplier);
 
             // Update State
             updateScore(points);
             currentState.timer += timeBonus;
-            updateTimerDisplay(); // reflect time jump immediately
+            updateTimerDisplay(); 
             
             currentState.flippedCards = [];
             currentState.isLocked = false;
@@ -310,15 +307,8 @@ function checkMatch() {
     } else {
         setTimeout(() => {
             audio.sfxError();
-            currentState.combo = 0;
+            currentState.combo = 0; // Reset combo on error
             
-            // Record attempts for both cards involved in the wrong guess
-            const val1 = card1.dataset.value;
-            const val2 = card2.dataset.value;
-            
-            currentState.cardAttempts[val1] = (currentState.cardAttempts[val1] || 0) + 1;
-            currentState.cardAttempts[val2] = (currentState.cardAttempts[val2] || 0) + 1;
-
             card1.classList.add('shake-error');
             card2.classList.add('shake-error');
             
@@ -328,7 +318,10 @@ function checkMatch() {
                 
                 currentState.flippedCards = [];
                 currentState.isLocked = false;
-                updateScore(-50); // Minus 50 for wrong guess
+                
+                // Penalty
+                updateScore(-20);
+
             }, 500);
         }, 600);
     }
